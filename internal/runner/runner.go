@@ -24,27 +24,11 @@ func insideRoot(root, file string) bool {
 }
 
 func(r *runner) Run(file string, args []string) (string, error) {
-	if ! insideRoot(r.root, file) {
-		return "", &Error{
-			"File outside root",
-			nil,
-		}
-	}
-
-	p := path.Join(r.root, file)
-
-	executor, err := exec.LookPath(p)
+	cmd, err := r.RunAsync(file, args)
 	if err != nil {
-		return "", convertError(err).Err
+		return "", err
 	}
-
-	execCmd := exec.Command(executor, args...)
-
-	res, err := execCmd.Output()
-	if err != nil {
-		return "", convertError(err).Err
-	}
-	return string(res), nil
+	return cmd.Wait()
 }
 
 func (r *runner) RunAsync(file string, args []string) (*rCmd, error) {
