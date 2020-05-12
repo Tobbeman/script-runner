@@ -30,13 +30,13 @@ func TestRunner(t *testing.T) {
 		assert.Equal(t, "lol\n", res)
 	}
 
-	if rCmd2.CheckFinished() {
+	//Should always be true, since we wait on the same command above
+	if assert.True(t, rCmd2.CheckFinished()) {
 		res, err = rCmd2.Collect()
 		if assert.Nil(t, err) {
 			assert.Equal(t, "lol\n", res)
 		}
 	}
-
 
 	res, err = r.Run("does_not_exist.sh", []string{})
 	assert.NotNil(t, err)

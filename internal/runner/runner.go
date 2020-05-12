@@ -1,7 +1,6 @@
 package runner
 
 import (
-	"bytes"
 	"os/exec"
 	"path"
 	"strings"
@@ -63,14 +62,12 @@ func (r *runner) RunAsync(file string, args []string) (*rCmd, error) {
 		return nil, convertError(err).Err
 	}
 
-	var output bytes.Buffer
-
 	c := rCmd{
 		&exec.Cmd {
 			Path:   executor,
 			Args:   args,
 		},
-		&output,
+		[]byte{},
 		false,
 		nil,
 	}

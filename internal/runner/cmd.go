@@ -1,13 +1,12 @@
 package runner
 
 import (
-	"bytes"
 	"os/exec"
 )
 
 type rCmd struct {
 	c      *exec.Cmd
-	output *bytes.Buffer
+	output []byte
 	done bool
 	err error
 }
@@ -24,14 +23,10 @@ func (c *rCmd) CheckFinished() bool {
 }
 
 func (c *rCmd) Collect() (string, error) {
-	return c.output.String(), c.err
+	return string(c.output), c.err
 }
 
 func (c *rCmd) start() {
-	res, err := c.c.CombinedOutput()
-
-	c.err = err
-	c.output = bytes.NewBuffer(res)
-
+	c.output, c.err = c.c.CombinedOutput()
 	c.done = true
 }
