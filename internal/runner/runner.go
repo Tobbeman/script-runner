@@ -6,12 +6,12 @@ import (
 	"strings"
 )
 
-type runner struct{
+type Runner struct{
 	root string
 }
 
-func New(root string) *runner {
-	return &runner{
+func New(root string) *Runner {
+	return &Runner{
 		root: root,
 	}
 }
@@ -23,7 +23,7 @@ func insideRoot(root, file string) bool {
 	return true
 }
 
-func(r *runner) Run(file string, args []string) (string, error) {
+func(r *Runner) Run(file string, args []string) (string, error) {
 	cmd, err := r.RunAsync(file, args)
 	if err != nil {
 		return "", err
@@ -31,7 +31,7 @@ func(r *runner) Run(file string, args []string) (string, error) {
 	return cmd.Wait()
 }
 
-func (r *runner) RunAsync(file string, args []string) (*rCmd, error) {
+func (r *Runner) RunAsync(file string, args []string) (*rCmd, error) {
 	if ! insideRoot(r.root, file) {
 		return nil, &Error{
 			"File outside root",
