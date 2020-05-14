@@ -7,14 +7,14 @@ import (
 )
 
 type Handler struct {
-	runner runner.Runner
-	config config.Config
+	runner *runner.Runner
+	config *config.Config
 }
 
-func New(r runner.Runner, c config.Config) *Handler {
+func New(r *runner.Runner, c *config.Config) *Handler {
 	return &Handler{r, c}
 }
 
-func (h *Handler) Register(g echo.Group) {
-	h.registerRunner(g)
+func (h *Handler) Register(g *echo.Group) {
+	h.registerRS(g)
 }

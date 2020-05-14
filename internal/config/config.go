@@ -10,14 +10,16 @@ import (
 
 type Config struct {
 	Token string
+	ScriptPath string
 }
 
-const DefaultPath = "./config.yaml"
+const DefaultConfigPath = "./config.yaml"
+const DefaultScriptPath = "./tests/scripts/accessible.sh"
 
 func Setup(p string) (*Config, error) {
 	path := p
 	if p == "" {
-		path = DefaultPath
+		path = DefaultConfigPath
 	}
 	if _, err := os.Stat(path); err != nil {
 		return create(path)
@@ -28,7 +30,8 @@ func Setup(p string) (*Config, error) {
 
 func create(path string) (*Config, error) {
 	c := Config{
-		generateToken(10),
+		Token: generateToken(10),
+		ScriptPath: DefaultScriptPath,
 	}
 	buf, err := yaml.Marshal(&c)
 	if err != nil {

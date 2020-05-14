@@ -5,15 +5,26 @@ import (
 	"net/http"
 )
 
-func (h *Handler) registerRunner(root echo.Group) {
-	root.POST("", h.runScript)
+func (h *Handler) registerRS(root *echo.Group) {
+	g := root.Group("rs")
+
+	g.POST("/:script", h.runScript)
 }
 
 func (h *Handler) runScript (ctx echo.Context) error {
 	if ! contains(h.config.Token, extractToken(ctx.Request().Header)) {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
-	return nil
+	script := ctx.Param("script")
+	if script == "" {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
+
+	res, err := h.runner.Run(script, []string{})
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
+	}
+	return ctx.String(http.StatusOK, res)
 }
 
 func extractToken(headers map[string][]string) []string {
