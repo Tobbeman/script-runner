@@ -3,24 +3,24 @@ package config
 import (
 	"crypto/rand"
 	"fmt"
+	"gopkg.in/go-playground/validator.v9"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
 )
 
 type Config struct {
-	Token string
-	ScriptPath string
+	Token string `yaml:"token" validate:"required"`
+	ScriptPath string `yaml:"scriptPath" validate:"required"`
+	Address string `yaml:"address" validate:"required"`
+	HrefAddress string `yaml:"hrefAddress"`
 }
 
-const DefaultConfigPath = "./config.yaml"
-const DefaultScriptPath = "./tests/scripts/accessible.sh"
+const DefaultConfigPath = "/etc/script-runner/config.yaml"
+const DefaultScriptPath = "/etc/script-runner/scripts"
+const DefaultAddress = "0.0.0.0:80"
 
-func Setup(p string) (*Config, error) {
-	path := p
-	if p == "" {
-		path = DefaultConfigPath
-	}
+func Setup(path string) (*Config, error) {
 	if _, err := os.Stat(path); err != nil {
 		return create(path)
 	} else {
@@ -32,6 +32,7 @@ func create(path string) (*Config, error) {
 	c := Config{
 		Token: generateToken(10),
 		ScriptPath: DefaultScriptPath,
+		Address: DefaultAddress,
 	}
 	buf, err := yaml.Marshal(&c)
 	if err != nil {
@@ -54,11 +55,20 @@ func load(path string) (*Config, error) {
 	if err != nil {
 		return nil, err
 	}
+	err = validator.New().Struct(&c)
+	if err != nil {
+		return nil, err
+	}
+
+	if c.HrefAddress == "" {
+		c.HrefAddress = c.Address
+	}
+
 	return &c, nil
 }
 
 func generateToken(len int) string {
 	b := make([]byte, len)
-	rand.Read(b)
+	_, _ = rand.Read(b)
 	return fmt.Sprintf("%x", b)
 }

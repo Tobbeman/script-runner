@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"gitlab.com/Tobbeman/script-runner/internal/config"
 	"gitlab.com/Tobbeman/script-runner/internal/handler"
 	"gitlab.com/Tobbeman/script-runner/internal/runner"
@@ -9,7 +10,10 @@ import (
 )
 
 func main(){
-	conf, err := config.Setup(config.DefaultConfigPath)
+	var configPath = flag.String("config-path", config.DefaultConfigPath, "filepath to config")
+	flag.Parse()
+
+	conf, err := config.Setup(*configPath)
 	if err != nil {
 		log.Fatal("error opening config: ", err)
 	}
@@ -23,7 +27,9 @@ func main(){
 
 	h.Register(root)
 
-	http.Start("0.0.0.0:8080")
+	if err := http.Start(conf.Address); err != nil {
+		log.Fatal(err)
+	}
 }
 
 

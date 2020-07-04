@@ -4,29 +4,29 @@ import (
 	"os/exec"
 )
 
-type rCmd struct {
+type RCmd struct {
 	c      *exec.Cmd
 	output []byte
 	done bool
 	err error
 }
 
-func (c *rCmd) Wait() (string, error){
-	for ! c.CheckFinished() {
+func (c *RCmd) Wait() (string, error){
+	for ! c.CheckDone() {
 
 	}
 	return c.Collect()
 }
 
-func (c *rCmd) CheckFinished() bool {
+func (c *RCmd) CheckDone() bool {
 	return c.done
 }
 
-func (c *rCmd) Collect() (string, error) {
+func (c *RCmd) Collect() (string, error) {
 	return string(c.output), c.err
 }
 
-func (c *rCmd) start() {
+func (c *RCmd) start() {
 	c.output, c.err = c.c.CombinedOutput()
 	c.done = true
 }

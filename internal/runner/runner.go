@@ -31,7 +31,7 @@ func(r *Runner) Run(file string, args []string) (string, error) {
 	return cmd.Wait()
 }
 
-func (r *Runner) RunAsync(file string, args []string) (*rCmd, error) {
+func (r *Runner) RunAsync(file string, args []string) (*RCmd, error) {
 	if ! insideRoot(r.root, file) {
 		return nil, &Error{
 			"File outside root",
@@ -46,7 +46,7 @@ func (r *Runner) RunAsync(file string, args []string) (*rCmd, error) {
 		return nil, convertError(err).Err
 	}
 
-	c := rCmd{
+	c := RCmd{
 		&exec.Cmd {
 			Path:   executor,
 			Args:   args,

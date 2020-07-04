@@ -11,14 +11,18 @@ import (
 	"testing"
 )
 
+const testDir = "../../tests/scripts/accessible"
+
 func TestRunScript(t *testing.T) {
 	// Setup
 	token := "lol"
-	h := New(
-		*runner.New("."),
-		config.Config{
-			Token: token,
-		})
+	r := runner.New(testDir)
+	config := config.Config{
+		Token: token,
+		ScriptPath: "",
+		Address: "",
+	}
+	h := New(r, &config)
 	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(""))
@@ -26,6 +30,8 @@ func TestRunScript(t *testing.T) {
 	req.Header.Set("X-Gitlab-Token", token)
 	rec := httptest.NewRecorder()
 	c := e.NewContext(req, rec)
+	c.SetParamNames("script")
+	c.SetParamValues("echo_lol.sh")
 
 	// Assertions
 	if assert.NoError(t, h.runScript(c)) {
@@ -36,6 +42,8 @@ func TestRunScript(t *testing.T) {
 	req.Header.Set("X-Gitlab-Token", "token")
 	rec = httptest.NewRecorder()
 	c = e.NewContext(req, rec)
+	c.SetParamNames("script")
+	c.SetParamValues("echo_lol.sh")
 
 	// Assertions
 	if assert.Error(t, h.runScript(c)) {

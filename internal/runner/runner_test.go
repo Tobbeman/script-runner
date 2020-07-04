@@ -16,7 +16,7 @@ func TestRunner(t *testing.T) {
 
 	rCmd, err := r.RunAsync("sleep_echo_lol.sh", []string{})
 	if assert.Nil(t, err) {
-		assert.False(t, rCmd.CheckFinished())
+		assert.False(t, rCmd.CheckDone())
 	}
 
 
@@ -34,7 +34,7 @@ func TestRunner(t *testing.T) {
 	}
 
 	//Should always be true, since we wait on the same command above
-	if assert.True(t, rCmd.CheckFinished()) {
+	if assert.True(t, rCmd.CheckDone()) {
 		res, err = rCmd.Collect()
 		if assert.Nil(t, err) {
 			assert.Equal(t, "lol\n", res)
