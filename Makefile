@@ -13,3 +13,6 @@ arm: ## Cross compile for arm
 
 test: ## Run tests
 	@go test -cover -v ./...
+
+format: ##Run go fmt
+	@go fmt ./...

@@ -9,7 +9,7 @@ import (
 	"log"
 )
 
-func main(){
+func main() {
 	var configPath = flag.String("config-path", config.DefaultConfigPath, "filepath to config")
 	flag.Parse()
 
@@ -20,7 +20,15 @@ func main(){
 	log.Print("Loaded config, token is ", conf.Token)
 
 	r := runner.New(conf.ScriptPath)
-	h := handler.New(r, conf)
+
+	var s *runner.RCmdStore
+	if conf.HasRetention() {
+		s = runner.NewStoreWithRetention(conf.Retention)
+	} else {
+		s = runner.NewStore()
+	}
+
+	h := handler.New(r, s, conf)
 
 	http := server.New()
 	root := http.Group("")
@@ -31,5 +39,3 @@ func main(){
 		log.Fatal(err)
 	}
 }
-
-

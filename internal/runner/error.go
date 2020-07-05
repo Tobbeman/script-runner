@@ -16,7 +16,6 @@ func (e *Error) Error() string {
 	return "exec: " + strconv.Quote(e.Name) + ": " + e.Err.Error()
 }
 
-
 func convertError(err error) *Error {
 	if e, ok := err.(*exec.Error); ok {
 		return &Error{

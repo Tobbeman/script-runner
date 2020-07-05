@@ -19,7 +19,6 @@ func TestRunner(t *testing.T) {
 		assert.False(t, rCmd.CheckDone())
 	}
 
-
 	rCmd2, err := r.RunAsync("sleep_echo_lol.sh", []string{})
 	assert.Nil(t, err)
 

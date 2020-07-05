@@ -18,11 +18,14 @@ func TestRunScript(t *testing.T) {
 	token := "lol"
 	r := runner.New(testDir)
 	config := config.Config{
-		Token: token,
+		Token:      token,
 		ScriptPath: "",
-		Address: "",
+		Address:    "",
+		ReadTokenHeaders: []string{
+			"X-Gitlab-Token",
+		},
 	}
-	h := New(r, &config)
+	h := New(r, nil, &config)
 	e := echo.New()
 
 	req := httptest.NewRequest(http.MethodPost, "/", strings.NewReader(""))

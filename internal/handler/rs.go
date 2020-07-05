@@ -13,8 +13,8 @@ func (h *Handler) registerRS(root *echo.Group) {
 	g.Any("/async/:uuid/status", h.asyncStatus)
 }
 
-func (h *Handler) runScript (ctx echo.Context) error {
-	if ! contains(h.config.Token, extractToken(ctx.Request().Header)) {
+func (h *Handler) runScript(ctx echo.Context) error {
+	if !contains(h.config.Token, extractToken(h.config.ReadTokenHeaders, ctx.Request().Header)) {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
 	script := ctx.Param("script")
@@ -29,8 +29,8 @@ func (h *Handler) runScript (ctx echo.Context) error {
 	return ctx.String(http.StatusOK, res)
 }
 
-func (h *Handler) asyncRunScript (ctx echo.Context) error {
-	if ! contains(h.config.Token, extractToken(ctx.Request().Header)) {
+func (h *Handler) asyncRunScript(ctx echo.Context) error {
+	if !contains(h.config.Token, extractToken(h.config.ReadTokenHeaders, ctx.Request().Header)) {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
 	script := ctx.Param("script")
@@ -42,13 +42,13 @@ func (h *Handler) asyncRunScript (ctx echo.Context) error {
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
 	}
-	uuid := h.Store(res)
-	ctx.Response().Header().Set("Location", h.config.HrefAddress + "/async/" + uuid + "/status")
+	uuid := h.store.Store(res)
+	ctx.Response().Header().Set("Location", h.config.HrefAddress+"/async/"+uuid+"/status")
 	return ctx.String(http.StatusOK, uuid)
 }
 
-func (h *Handler) asyncStatus (ctx echo.Context) error {
-	if ! contains(h.config.Token, extractToken(ctx.Request().Header)) {
+func (h *Handler) asyncStatus(ctx echo.Context) error {
+	if !contains(h.config.Token, extractToken(h.config.ReadTokenHeaders, ctx.Request().Header)) {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
 	uuid := ctx.Param("uuid")
@@ -56,7 +56,10 @@ func (h *Handler) asyncStatus (ctx echo.Context) error {
 		return echo.NewHTTPError(http.StatusNotFound)
 	}
 
-	cmd := h.Get(uuid)
+	found, cmd := h.store.Get(uuid)
+	if !found {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
 
 	done := cmd.CheckDone()
 	var output string
@@ -69,9 +72,9 @@ func (h *Handler) asyncStatus (ctx echo.Context) error {
 	}
 
 	res := struct {
-		Done bool `json:"done"`
+		Done   bool   `json:"done"`
 		Output string `json:"output"`
-	} {
+	}{
 		done,
 		output,
 	}
@@ -79,13 +82,16 @@ func (h *Handler) asyncStatus (ctx echo.Context) error {
 	return ctx.JSON(http.StatusOK, res)
 }
 
-func extractToken(headers map[string][]string) []string {
+func extractToken(allowed []string, headers map[string][]string) []string {
+	var foundTokens = []string{}
 	for key, value := range headers {
-		if key == "X-Gitlab-Token" {
-			return value
+		if contains(key, allowed) {
+			for _, token := range value {
+				foundTokens = append(foundTokens, token)
+			}
 		}
 	}
-	return []string{}
+	return foundTokens
 }
 
 func contains(val string, list []string) bool {

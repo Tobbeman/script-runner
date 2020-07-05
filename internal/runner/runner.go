@@ -4,9 +4,10 @@ import (
 	"os/exec"
 	"path"
 	"strings"
+	"time"
 )
 
-type Runner struct{
+type Runner struct {
 	root string
 }
 
@@ -17,13 +18,13 @@ func New(root string) *Runner {
 }
 
 func insideRoot(root, file string) bool {
-	if strings.Contains(file, ".."){
+	if strings.Contains(file, "..") {
 		return false
 	}
 	return true
 }
 
-func(r *Runner) Run(file string, args []string) (string, error) {
+func (r *Runner) Run(file string, args []string) (string, error) {
 	cmd, err := r.RunAsync(file, args)
 	if err != nil {
 		return "", err
@@ -32,7 +33,7 @@ func(r *Runner) Run(file string, args []string) (string, error) {
 }
 
 func (r *Runner) RunAsync(file string, args []string) (*RCmd, error) {
-	if ! insideRoot(r.root, file) {
+	if !insideRoot(r.root, file) {
 		return nil, &Error{
 			"File outside root",
 			nil,
@@ -47,13 +48,15 @@ func (r *Runner) RunAsync(file string, args []string) (*RCmd, error) {
 	}
 
 	c := RCmd{
-		&exec.Cmd {
-			Path:   executor,
-			Args:   args,
+		&exec.Cmd{
+			Path: executor,
+			Args: args,
 		},
 		[]byte{},
 		false,
 		nil,
+		time.Time{},
+		time.Time{},
 	}
 
 	go c.start()
