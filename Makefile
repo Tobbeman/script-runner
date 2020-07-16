@@ -16,3 +16,6 @@ test: ## Run tests
 
 format: ##Run go fmt
 	@go fmt ./...
+
+init_hooks: ##Will setup githooks for this git repository
+	@ln -sf $$(pwd)/githooks/* $$(pwd)/.git/hooks
