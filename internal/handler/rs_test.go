@@ -11,7 +11,7 @@ import (
 	"testing"
 )
 
-const testDir = "../../tests/scripts/accessible"
+const testDir = "../../test/scripts/accessible"
 
 func TestRunScript(t *testing.T) {
 	// Setup

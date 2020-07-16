@@ -8,9 +8,21 @@ import (
 func (h *Handler) registerRS(root *echo.Group) {
 	g := root.Group("rs")
 
+	g.GET("/list", h.listScripts)
 	g.Any("/:script", h.runScript)
 	g.Any("/async/:script", h.asyncRunScript)
 	g.Any("/async/:uuid/status", h.asyncStatus)
+}
+
+func (h *Handler) listScripts(ctx echo.Context) error {
+	if !contains(h.config.Token, extractToken(h.config.ReadTokenHeaders, ctx.Request().Header)) {
+		return echo.NewHTTPError(http.StatusNotFound)
+	}
+	res, err := h.runner.List()
+	if err != nil {
+		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
+	}
+	return ctx.JSON(http.StatusOK, res)
 }
 
 func (h *Handler) runScript(ctx echo.Context) error {
@@ -44,7 +56,7 @@ func (h *Handler) asyncRunScript(ctx echo.Context) error {
 	}
 	uuid := h.store.Store(res)
 	ctx.Response().Header().Set("Location", h.config.HrefAddress+"/async/"+uuid+"/status")
-	return ctx.String(http.StatusOK, uuid)
+	return ctx.String(http.StatusCreated, uuid)
 }
 
 func (h *Handler) asyncStatus(ctx echo.Context) error {

@@ -1,5 +1,5 @@
 PROJECT=~/go/src/gitlab.com/Tobbeman/script-runner
-.PHONY: help
+.PHONY: help test
 .DEFAULT_GOAL := help
 
 help:

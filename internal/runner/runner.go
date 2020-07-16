@@ -1,8 +1,10 @@
 package runner
 
 import (
+	"os"
 	"os/exec"
 	"path"
+	"path/filepath"
 	"strings"
 	"time"
 )
@@ -17,11 +19,19 @@ func New(root string) *Runner {
 	}
 }
 
-func insideRoot(root, file string) bool {
-	if strings.Contains(file, "..") {
-		return false
+func (r *Runner) List() ([]string, error) {
+	var files []string
+	cleanDir := filepath.Clean(r.root)
+	err := filepath.Walk(cleanDir, func(path string, info os.FileInfo, err error) error {
+		if info != nil && !info.IsDir() {
+			files = append(files, strings.Replace(path, cleanDir, "", 1)[1:])
+		}
+		return nil
+	})
+	if err != nil {
+		return nil, err
 	}
-	return true
+	return files, nil
 }
 
 func (r *Runner) Run(file string, args []string) (string, error) {
@@ -61,4 +71,13 @@ func (r *Runner) RunAsync(file string, args []string) (*RCmd, error) {
 
 	go c.start()
 	return &c, nil
+}
+
+//==============
+
+func insideRoot(root, file string) bool {
+	if strings.Contains(file, "..") {
+		return false
+	}
+	return true
 }

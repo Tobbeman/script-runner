@@ -1,5 +1,5 @@
 For 2.0:
-  - Add list endpoint, listing all available scripts
+  - Add list endpoint, listing all available scripts # DONE
   - Add async/list, listing all running scripts
-  - Add simple user/logic functions
+  - Add simple user/login functionality
   - Create simple frontend
