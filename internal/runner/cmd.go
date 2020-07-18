@@ -6,7 +6,7 @@ import (
 )
 
 type RCmd struct {
-	c         *exec.Cmd
+	cmd       *exec.Cmd
 	output    []byte
 	done      bool
 	err       error
@@ -31,7 +31,7 @@ func (c *RCmd) Collect() (string, error) {
 
 func (c *RCmd) start() {
 	c.StartTime = time.Now()
-	c.output, c.err = c.c.CombinedOutput()
+	c.output, c.err = c.cmd.CombinedOutput()
 	c.EndTime = time.Now()
 	c.done = true
 }
