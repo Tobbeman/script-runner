@@ -39,16 +39,4 @@ func TestRunScript(t *testing.T) {
 	// Assertions
 	if assert.NoError(t, h.runScript(c)) {
 	}
-
-	req = httptest.NewRequest(http.MethodPost, "/", strings.NewReader(""))
-	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
-	req.Header.Set("X-Gitlab-Token", "token")
-	rec = httptest.NewRecorder()
-	c = e.NewContext(req, rec)
-	c.SetParamNames("script")
-	c.SetParamValues("echo_lol.sh")
-
-	// Assertions
-	if assert.Error(t, h.runScript(c)) {
-	}
 }

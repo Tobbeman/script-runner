@@ -8,6 +8,15 @@ import (
 func (h *Handler) registerRS(root *echo.Group) {
 	g := root.Group("rs")
 
+	g.Use(func(next echo.HandlerFunc) echo.HandlerFunc {
+		return func(ctx echo.Context) error {
+			if !contains(h.config.Token, extractToken(h.config.ReadTokenHeaders, ctx.Request().Header)) {
+				return echo.NewHTTPError(http.StatusNotFound)
+			}
+			return next(ctx)
+		}
+	})
+
 	g.GET("/_list", h.listScripts)
 	g.Any("/:script", h.runScript)
 	g.Any("/async/:script", h.asyncRunScript)
@@ -16,9 +25,6 @@ func (h *Handler) registerRS(root *echo.Group) {
 }
 
 func (h *Handler) listScripts(ctx echo.Context) error {
-	if !contains(h.config.Token, extractToken(h.config.ReadTokenHeaders, ctx.Request().Header)) {
-		return echo.NewHTTPError(http.StatusNotFound)
-	}
 	res, err := h.runner.List()
 	if err != nil {
 		return echo.NewHTTPError(http.StatusInternalServerError).SetInternal(err)
@@ -27,9 +33,6 @@ func (h *Handler) listScripts(ctx echo.Context) error {
 }
 
 func (h *Handler) runScript(ctx echo.Context) error {
-	if !contains(h.config.Token, extractToken(h.config.ReadTokenHeaders, ctx.Request().Header)) {
-		return echo.NewHTTPError(http.StatusNotFound)
-	}
 	script := ctx.Param("script")
 	if script == "" {
 		return echo.NewHTTPError(http.StatusNotFound)
@@ -43,9 +46,6 @@ func (h *Handler) runScript(ctx echo.Context) error {
 }
 
 func (h *Handler) asyncRunScript(ctx echo.Context) error {
-	if !contains(h.config.Token, extractToken(h.config.ReadTokenHeaders, ctx.Request().Header)) {
-		return echo.NewHTTPError(http.StatusNotFound)
-	}
 	script := ctx.Param("script")
 	if script == "" {
 		return echo.NewHTTPError(http.StatusNotFound)
@@ -61,9 +61,6 @@ func (h *Handler) asyncRunScript(ctx echo.Context) error {
 }
 
 func (h *Handler) asyncListRunning(ctx echo.Context) error {
-	if !contains(h.config.Token, extractToken(h.config.ReadTokenHeaders, ctx.Request().Header)) {
-		return echo.NewHTTPError(http.StatusNotFound)
-	}
 	// Using 'var res AsyncListItems' result in nil pointer, not empty array
 	res := make([]AsyncListItems, 0)
 	for id, cmd := range h.store.GetMap() {
@@ -77,9 +74,6 @@ func (h *Handler) asyncListRunning(ctx echo.Context) error {
 }
 
 func (h *Handler) asyncStatus(ctx echo.Context) error {
-	if !contains(h.config.Token, extractToken(h.config.ReadTokenHeaders, ctx.Request().Header)) {
-		return echo.NewHTTPError(http.StatusNotFound)
-	}
 	uuid := ctx.Param("uuid")
 	if uuid == "" {
 		return echo.NewHTTPError(http.StatusNotFound)
