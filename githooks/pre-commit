@@ -1,6 +1,28 @@
 #!/bin/bash
 function log {
-  echo "Pre-commit: $@"
+  echo "Pre-commit: $1"
 }
+# Function found https://github.com/edsrzf/gofmt-git-hook/blob/master/fmt-fix
+fix_fmt() {
+    hash gofmt 2>&- || { echo >&2 "gofmt not in PATH."; exit 1; }
+    OLDIFS=$IFS
+    IFS='
+'
+    exitcode=0
+    for file in $(git diff --cached --name-only --diff-filter=ACM | grep '\.go$')
+    do
+        output=$(gofmt -w "$file")
+        if test -n "$output"
+        then
+            # any output is a syntax error
+            echo >&2 "$output"
+            exitcode=1
+        fi
+        git add "$file"
+    done
+    IFS=$OLDIFS
+    exit $exitcode
+}
+
 log "Formatting"
-go fmt ./...
+fix_fmt
