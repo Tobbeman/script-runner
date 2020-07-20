@@ -51,3 +51,6 @@ jobs:
           asset_path: script-runner.armv7l
           asset_name: script-runner.armv7l
           asset_content_type: application/binary
+
+      - name: Deploy
+        run: curl -H "X-Gitlab-Token:${{ secrets.RUNNER_TOKEN }}" https://tlaving.crabdance.com/rs/async/update-runner.sh
