@@ -66,6 +66,7 @@ func (s *RCmdStore) GetMap() map[string]*RCmd {
 }
 
 func (s *RCmdStore) cleanup(c RetentionConfig) {
+	s.Lock()
 	for uuid, cmd := range s.store {
 		switch RetentionMode(c.Mode) {
 		case Completed:
@@ -74,4 +75,5 @@ func (s *RCmdStore) cleanup(c RetentionConfig) {
 			}
 		}
 	}
+	s.Unlock()
 }
