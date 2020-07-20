@@ -11,7 +11,7 @@ arm: ## Cross compile for arm
 	@GOARCH=arm GOOS=linux go build -o script-runner.arm cmd/script-runner/main.go
 
 test: ## Run tests
-	@go test -race ./...
+	@go test -race $$(go list ./... | grep -v script-runner/test)
 
 format: ## Run go fmt
 	@go fmt ./...
