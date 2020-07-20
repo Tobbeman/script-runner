@@ -1,4 +1,4 @@
-name: Test
+name: Mainflow
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
 
 jobs:
 
-  test:
-    name: Build
+  build:
+    name: build
     runs-on: ubuntu-latest
     steps:
 
@@ -31,3 +31,8 @@ jobs:
       
     - name: Build
       run: make build
+
+    - uses: actions/upload-artifact@v2
+      with:
+        name: script-runner
+        path: script-runner
