@@ -1,4 +1,4 @@
-.PHONY: help test
+.PHONY: help test build arm format init_hooks
 .DEFAULT_GOAL := help
 
 help:
@@ -11,10 +11,10 @@ arm: ## Cross compile for arm
 	@GOARCH=arm GOOS=linux go build -o script-runner.arm cmd/script-runner/main.go
 
 test: ## Run tests
-	@go test ./...
+	@go test -race ./...
 
-format: ##Run go fmt
+format: ## Run go fmt
 	@go fmt ./...
 
-init_hooks: ##Will setup githooks for this git repository
+init_hooks: ## Will setup githooks for this git repository
 	@ln -sf $$(pwd)/githooks/* $$(pwd)/.git/hooks

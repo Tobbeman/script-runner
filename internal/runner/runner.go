@@ -6,6 +6,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -67,6 +68,7 @@ func (r *Runner) RunAsync(file string, args []string) (*RCmd, error) {
 		nil,
 		time.Time{},
 		time.Time{},
+		sync.RWMutex{},
 	}
 
 	go c.start()

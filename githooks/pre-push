@@ -4,4 +4,4 @@ function log {
   echo "Pre-push: $@"
 }
 log "Testing"
-go test ./...
+make test
